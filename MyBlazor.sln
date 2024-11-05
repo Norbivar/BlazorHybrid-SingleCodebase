@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyBlazor.Hybrid", "MyBlazor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyBlazor.SharedUI", "MyBlazor.SharedUI\MyBlazor.SharedUI.csproj", "{304D0255-569C-41AF-8512-36C31DAF1A63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBlazor.SharedUI.Tests", "MyBlazor.SharedUI.Tests\MyBlazor.SharedUI.Tests.csproj", "{9B26F7BD-FDC6-4F87-8990-AF953576FD5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyBlazor.SharedUI.Tests", "MyBlazor.SharedUI.Tests\MyBlazor.SharedUI.Tests.csproj", "{9B26F7BD-FDC6-4F87-8990-AF953576FD5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

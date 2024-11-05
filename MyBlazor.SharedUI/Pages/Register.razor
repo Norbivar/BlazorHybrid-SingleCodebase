@@ -1,0 +1,51 @@
+﻿@page "/account/register"
+
+@inject HttpClient HttpClient
+@inject NavigationManager navigationManager;
+
+@using MyBlazor.SharedUI.Pages.Models
+@using System.Text.Json
+@using System.Text
+
+<h3>Register</h3>
+
+<EditForm Model="@registerModel" OnValidSubmit="HandleSubmit">
+	<AntiforgeryToken />
+
+	<fieldset class="grid-container">
+		<label for="email">E-mail:</label>
+		<input type="text" name="email" value=@registerModel.Email />
+
+		<label for="pass">Password:</label>
+		<input type="password" name="pass" value=@registerModel.Password />
+
+		<label for="pass">Password again:</label>
+		<input type="password" name="pass2" />
+
+		<input type="submit" value="Register!">
+	</fieldset>
+</EditForm>
+
+@code {
+	private RegisterModel registerModel = new RegisterModel();
+
+	private async Task HandleSubmit()
+	{
+		byte[] data = System.Text.Encoding.ASCII.GetBytes(registerModel.Password);
+		data = System.Security.Cryptography.SHA256.Create().ComputeHash(data);
+		registerModel.Password = System.Text.Encoding.ASCII.GetString(data);
+
+		var content = new StringContent(JsonSerializer.Serialize(registerModel), Encoding.UTF8, "application/json");
+		var response = await HttpClient.PostAsync($"{navigationManager.BaseUri}/account/register", content)
+			.ConfigureAwait(false);
+
+		if (response.IsSuccessStatusCode)
+		{
+			// Handle successful registration (e.g., navigate or show success message)
+		}
+		else
+		{
+			// Handle error (e.g., display error message)
+		}
+	}
+}

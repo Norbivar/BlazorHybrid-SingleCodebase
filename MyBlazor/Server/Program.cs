@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using MyBlazor.Server.Database;
+using MyBlazor.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddDbContext<UsersContext>(
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), 
+        sqlOptions => sqlOptions.EnableRetryOnFailure()
+    ),
+    ServiceLifetime.Scoped
+);
+
+builder.Services.AddSingleton<ISessionTrackerService, SessionTrackerService>();
 
 var app = builder.Build();
 

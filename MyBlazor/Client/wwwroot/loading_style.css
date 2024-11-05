@@ -1,0 +1,26 @@
+﻿.loader {
+    font-size: 20px;
+    color: black;
+    display: inline-block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 300;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+    .loader:after {
+        content: '';
+        height: 4px;
+        width: 0%;
+        display: block;
+        background: #FF3D00;
+        animation: 0.5s lineGrow linear infinite;
+    }
+
+@keyframes lineGrow {
+    to {
+        width: 100%;
+    }
+}
