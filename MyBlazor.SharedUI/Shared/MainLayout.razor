@@ -1,8 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
+@using MyBlazor.SharedUI.Pages.Models
+
 <div class="page">
 	<div class="sidebar">
 		<NavMenu />
+	</div>
+
+	<div id="info-lane">
+		@foreach(var notif in notifications)
+		{
+			<NotificationSwimmer notificationModel=@notif />
+		}
 	</div>
 
 	<main>
@@ -17,4 +26,33 @@
 </div>
 
 @code {
+	private List<NotificationModel> notifications = new List<NotificationModel>();
+
+	public async Task CreateNotification(string title, string description, TimeSpan deleteAfter)
+	{
+		var notif = new NotificationModel {
+				Title = title,
+				Description = description
+			};
+
+		notif.ShouldDisappearHandler = new Timer(async state => {
+			notif.Display = false;
+			await InvokeAsync(StateHasChanged);
+			await Task.Delay(700);
+
+			notifications.Remove(notif);
+			await InvokeAsync(StateHasChanged);
+		}, notif, deleteAfter, Timeout.InfiniteTimeSpan);
+
+		notifications.Add(notif);
+		await InvokeAsync(StateHasChanged);
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		CreateNotification("Hello!", "I am here to test out this swimlane info bar!", TimeSpan.FromSeconds(100000d));
+		CreateNotification("Oi!", "I are here you are here!", TimeSpan.FromSeconds(15d));
+		CreateNotification("Cső!", "Wasziszt dasz?", TimeSpan.FromSeconds(5d));
+		CreateNotification("asdasd!", "asdadadsadadsadasdasd", TimeSpan.FromSeconds(20d));
+	}
 }

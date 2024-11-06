@@ -12,9 +12,13 @@ namespace MyBlazor.Server.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .HasIndex(b => b.Id)
-                .IsUnique();
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users", "blazortest");
+
+				entity.HasIndex(b => b.Id)
+	                .IsUnique();
+			});
         }
     }
 
