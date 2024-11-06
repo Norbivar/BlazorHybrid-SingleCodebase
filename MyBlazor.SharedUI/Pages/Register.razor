@@ -1,11 +1,13 @@
 ﻿@page "/account/register"
 
-@inject HttpClient HttpClient
-@inject NavigationManager navigationManager;
-
+@using MyBlazor.Shared.Notifications
 @using MyBlazor.SharedUI.Pages.Models
 @using System.Text.Json
 @using System.Text
+
+@inject HttpClient HttpClient
+@inject NavigationManager navigationManager;
+@inject INotificationService NotificationService
 
 <h3>Register</h3>
 
@@ -44,7 +46,7 @@
 
 		if (!isEmailValid || !isPasswordValid)
 		{
-			Console.WriteLine("Invalid email or password!");
+			NotificationService.SendNotificationSwimmer("Error", "E-mail or password is malformed or not at least 3 characters!", NotificationType.Error);
 			return;
 		}
 
@@ -61,18 +63,16 @@
 
 			if (response.IsSuccessStatusCode)
 			{
-				Console.WriteLine("SUCCESS!!!");
-				// Handle successful registration (e.g., navigate or show success message)
+				NotificationService.SendNotificationSwimmer("Success", "Account registered!");
 			}
 			else
 			{
-				Console.WriteLine("FAILED!");
-				// Handle error (e.g., display error message)
+				NotificationService.SendNotificationSwimmer("Error", "Error encountered while registering!", NotificationType.Error);
 			}
 		}
 		else
 		{
-			Console.WriteLine("PASS MISMATCH!");
+			NotificationService.SendNotificationSwimmer("Error", "Entered passwords are different!", NotificationType.Error);
 		}
 	}
 }

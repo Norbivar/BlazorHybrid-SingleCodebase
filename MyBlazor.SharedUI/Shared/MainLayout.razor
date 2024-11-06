@@ -1,16 +1,19 @@
 ﻿@inherits LayoutComponentBase
 
+@using MyBlazor.Shared.Notifications
 @using MyBlazor.SharedUI.Pages.Models
+
+@inject INotificationService NotificationService
 
 <div class="page">
 	<div class="sidebar">
 		<NavMenu />
 	</div>
 
-	<div id="info-lane">
-		@foreach(var notif in notifications)
+	<div id="swim-lane">
+		@foreach (var notif in notifications)
 		{
-			<NotificationSwimmer notificationModel=@notif />
+			<NotificationSwimmer NotificationSwimmerModel=@notif />
 		}
 	</div>
 
@@ -26,16 +29,26 @@
 </div>
 
 @code {
-	private List<NotificationModel> notifications = new List<NotificationModel>();
+	private List<NotificationSwimmerModel> notifications = new List<NotificationSwimmerModel>();
 
-	public async Task CreateNotification(string title, string description, TimeSpan deleteAfter)
+	private async void AddNotificationSwimmer(MyBlazor.Shared.Notifications.NotificationSwimmer notification)
 	{
-		var notif = new NotificationModel {
-				Title = title,
-				Description = description
+		var notif = new NotificationSwimmerModel
+			{
+				Title = notification.Title,
+				Description = notification.Description,
+				Icon = NotificationSwimmerModel.NotificationTypeToIcon(notification.Type)
 			};
 
-		notif.ShouldDisappearHandler = new Timer(async state => {
+		var deleteAfter = TimeSpan.FromSeconds(10);
+
+		notif.ShouldDisappearHandler = new Timer(async state =>
+		{
+			while (notif.HoveredOver && !notif.ManuallyClosed)
+			{
+				await Task.Delay(500);
+			}
+
 			notif.Display = false;
 			await InvokeAsync(StateHasChanged);
 			await Task.Delay(700);
@@ -48,11 +61,14 @@
 		await InvokeAsync(StateHasChanged);
 	}
 
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
-		CreateNotification("Hello!", "I am here to test out this swimlane info bar!", TimeSpan.FromSeconds(100000d));
-		CreateNotification("Oi!", "I are here you are here!", TimeSpan.FromSeconds(15d));
-		CreateNotification("Cső!", "Wasziszt dasz?", TimeSpan.FromSeconds(5d));
-		CreateNotification("asdasd!", "asdadadsadadsadasdasd", TimeSpan.FromSeconds(20d));
+		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
+	}
+
+	public void Dispose()
+	{
+		// Unsubscribe when the component is disposed
+		NotificationService.OnNotificationSwimmerReceived -= AddNotificationSwimmer;
 	}
 }

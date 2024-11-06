@@ -1,4 +1,5 @@
 ﻿using MyBlazor.Hybrid.Services;
+using MyBlazor.Shared.Notifications;
 
 namespace MyBlazor.Hybrid
 {
@@ -25,8 +26,9 @@ namespace MyBlazor.Hybrid
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("Production API") });
 #endif
             builder.Services.AddScoped<IFetchDataService, FetchDataService>();
+			builder.Services.AddSingleton<INotificationService, NotificationService>();
 
-            return builder.Build();
+			return builder.Build();
         }
     }
 }

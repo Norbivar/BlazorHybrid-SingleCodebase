@@ -1,23 +1,36 @@
 ﻿@using MyBlazor.SharedUI.Pages.Models
 
-<div class="base @(notificationModel.Display ? "sliding-in" : "sliding-out")">
-	<div class="internal">
-		<div class="title item item-1">
-			<span class="oi oi-info me-2" aria-hidden="true"></span>
-			<strong>@notificationModel.Title</strong>
-		</div>
+<div class="base @(notificationSwimmerModel.Display ? "sliding-in" : "sliding-out")" @onmouseover="MouseOver" @onmouseout="MouseOut">
+	<table class="internal">
+		<tr>
+			<td class="title">
+				<span class="oi @notificationSwimmerModel.Icon me-2" aria-hidden="true"></span>
+				<strong>@notificationSwimmerModel.Title</strong>
+			</td>
 
-		<div class="desc item item-2">
-			@notificationModel.Description
-		</div>
-
-		<div class="exit item item-3">
-			<span class="oi oi-x" aria-hidden="true"></span>
-		</div>
-	</div>
+			<td class="exit">
+				<div @onclick="ForwardEarlyDisappear" style="cursor: pointer;">
+					<span class="oi oi-x" aria-hidden="true"></span>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="desc">
+				@notificationSwimmerModel.Description
+			</td>
+		</tr>
+	</table>
 </div>
 
 @code {
 	[Parameter]
-	public required NotificationModel notificationModel { get; set; }
+	public required NotificationSwimmerModel notificationSwimmerModel { get; set; }
+
+	void MouseOver(MouseEventArgs e) { notificationSwimmerModel.HoveredOver = true; }
+	void MouseOut(MouseEventArgs e) { notificationSwimmerModel.HoveredOver = false; }
+	void ForwardEarlyDisappear()
+	{
+		notificationSwimmerModel.ManuallyClosed = true;
+		notificationSwimmerModel.EarlyDisappear();
+	}
 }
