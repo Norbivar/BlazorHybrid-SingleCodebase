@@ -11,15 +11,15 @@
 
 <h3>Register</h3>
 
-<EditForm Model="@registerModel" OnValidSubmit="HandleSubmit">
+<EditForm Model="@myModel" OnValidSubmit="HandleSubmit">
 	<AntiforgeryToken />
 
 	<fieldset class="grid-container">
 		<label for="email">E-mail:</label>
-		<input type="text" name="email" @bind=registerModel.Email />
+		<input type="text" name="email" @bind=myModel.Email />
 
 		<label for="pass">Password:</label>
-		<input type="password" name="pass" @bind=registerModel.Password />
+		<input type="password" name="pass" @bind=myModel.Password />
 
 		<label for="pass">Password again:</label>
 		<input type="password" name="pass2" @bind=passwordAgain />
@@ -29,20 +29,13 @@
 </EditForm>
 
 @code {
+	private LoginRegisterModel myModel = new LoginRegisterModel();
 	private string passwordAgain = "";
-	private RegisterModel registerModel = new RegisterModel();
-
-	private string Encrypt(string text)
-	{
-		byte[] data = System.Text.Encoding.ASCII.GetBytes(text);
-		data = System.Security.Cryptography.SHA256.Create().ComputeHash(data);
-		return System.Text.Encoding.ASCII.GetString(data);
-	}
 
 	private async Task HandleSubmit()
 	{
-		var isEmailValid = registerModel.Email.Length > 3 || !registerModel.Email.Contains('@');
-		var isPasswordValid = registerModel.Password.Length > 3;
+		var isEmailValid = myModel.Email.Length > 3 || !myModel.Email.Contains('@');
+		var isPasswordValid = myModel.Password.Length > 3;
 
 		if (!isEmailValid || !isPasswordValid)
 		{
@@ -50,14 +43,9 @@
 			return;
 		}
 
-		RegisterModel toBeSentModel = registerModel.ShallowCopy();
-		toBeSentModel.Password = Encrypt(toBeSentModel.Password);
-
-		var passwordAgainEncrypted = Encrypt(passwordAgain);
-
-		if (passwordAgainEncrypted.Equals(toBeSentModel.Password))
+		if (passwordAgain.Equals(myModel.Password))
 		{
-			var content = new StringContent(JsonSerializer.Serialize(toBeSentModel), Encoding.UTF8, "application/json");
+			var content = new StringContent(JsonSerializer.Serialize(myModel), Encoding.UTF8, "application/json");
 			var response = await HttpClient.PostAsync($"{navigationManager.BaseUri}account/register", content)
 				.ConfigureAwait(false);
 
@@ -67,7 +55,18 @@
 			}
 			else
 			{
-				NotificationService.SendNotificationSwimmer("Error", "Error encountered while registering!", NotificationType.Error);
+				var responseContent = await response.Content.ReadAsStringAsync();
+				var result = JsonSerializer.Deserialize<RegisterResultModel>(responseContent);
+
+				if (result != null && result.Errors != null)
+				{
+					var errorList = String.Join("\n", result.Errors);
+					NotificationService.SendNotificationSwimmer("Error", errorList, NotificationType.Error);
+				}
+				else
+				{
+					NotificationService.SendNotificationSwimmer("Error", "Error while registering!", NotificationType.Error);
+				}
 			}
 		}
 		else

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -8,13 +9,14 @@
 	<link href="_content/MyBlazor.SharedUI/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
 	<link href="_content/MyBlazor.SharedUI/css/app.css" rel="stylesheet" />
 	<link href="MyBlazor.Hybrid.styles.css" rel="stylesheet" />
+	<link href="loading_style.css" rel="stylesheet" />
 </head>
 
 <body>
-
 	<div class="status-bar-safe-area"></div>
 
-	<div id="app">Loading...</div>
+	<div id="loader" class="loader">Loading...</div>
+	<div id="app"></div>
 
 	<div id="blazor-error-ui">
 		An unhandled error has occurred.
@@ -23,7 +25,14 @@
 	</div>
 
 	<script src="_framework/blazor.webview.js" autostart="false"></script>
-
+	<script>
+		function removeLoader() {
+			const loader = document.getElementById('loader');
+			if (loader) {
+				loader.style.display = 'none';
+			}
+		}
+	</script>
 </body>
 
 </html>

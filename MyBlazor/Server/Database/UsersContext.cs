@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace MyBlazor.Server.Database
 {
-    public class UsersContext : DbContext
-    {
-        public DbSet<User> Users { get; set; }
+    public class UsersContext : IdentityDbContext<User, IdentityRole<int>, int>
+	{
+        //public DbSet<User> Users { get; set; }
 
         public UsersContext(DbContextOptions<UsersContext> options) : base(options)
         {
@@ -12,7 +14,9 @@ namespace MyBlazor.Server.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(entity =>
+			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("Users", "blazortest");
 
@@ -22,8 +26,8 @@ namespace MyBlazor.Server.Database
         }
     }
 
-    public class User : Shared.User
-    {
-        public string Password { get; set; }
+    public class User : IdentityUser<int>
+	{
+		public string Name { get; set; }
     }
 }

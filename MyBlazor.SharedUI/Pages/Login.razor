@@ -1,0 +1,80 @@
+﻿@page "/account/login"
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using MyBlazor.Shared.Authentication
+@using MyBlazor.Shared.Notifications
+@using MyBlazor.SharedUI.Pages.Models
+@using System.Text.Json
+@using System.Text
+@using Blazored.LocalStorage
+@using System.Net.Http.Headers
+
+@inject HttpClient HttpClient
+@inject NavigationManager navigationManager;
+@inject INotificationService NotificationService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<h3>Login</h3>
+
+<EditForm Model="@myModel" OnValidSubmit="HandleSubmit">
+	<AntiforgeryToken />
+
+	<fieldset class="grid-container">
+		<label for="email">E-mail:</label>
+		<input type="text" name="email" @bind=myModel.Email />
+
+		<label for="pass">Password:</label>
+		<input type="password" name="pass" @bind=myModel.Password />
+
+		<input type="submit" value="Login">
+	</fieldset>
+</EditForm>
+
+@code {
+	private LoginRegisterModel myModel = new LoginRegisterModel();
+
+	private async Task HandleSubmit()
+	{
+		var isEmailValid = myModel.Email.Length >= 3 || !myModel.Email.Contains('@');
+		var isPasswordValid = myModel.Password.Length >= 3;
+
+		if (!isEmailValid || !isPasswordValid)
+		{
+			NotificationService.SendNotificationSwimmer("Error", "E-mail or password is malformed or not at least 3 characters!", NotificationType.Error);
+			return;
+		}
+
+		var content = new StringContent(JsonSerializer.Serialize(myModel), Encoding.UTF8, "application/json");
+		var response = await HttpClient.PostAsync($"{navigationManager.BaseUri}account/login", content)
+			.ConfigureAwait(false);
+
+		if (response.IsSuccessStatusCode)
+		{
+			var responseContent = await response.Content.ReadAsStringAsync();
+			var jwtToken = JsonSerializer.Deserialize<LoginResultModel>(responseContent);
+			if (jwtToken != null && jwtToken.JWTToken.Count() > 0)
+			{
+				if (AuthStateProvider is JWTAuthenticationStateProvider)
+				{
+					var result = await (AuthStateProvider as JWTAuthenticationStateProvider).MarkUserAsAuthenticated(jwtToken.JWTToken);
+					if (result)
+					{
+						NotificationService.SendNotificationSwimmer("Success", "Login successful!");
+					}
+					else
+					{
+						NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error);
+					}
+				}
+			}
+			else
+			{
+				Console.WriteLine("Error retrieving JWT Token!");
+			}
+		}
+		else
+		{
+			NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error);
+		}
+	}
+}

@@ -13,7 +13,6 @@ namespace MyBlazor.Shared.Notifications
 	}
 	public class NotificationSwimmer
 	{
-
 		public required string Title { get; set; }
 		public required string Description { get; set; }
 		public NotificationType Type { get; set; } = NotificationType.Info;

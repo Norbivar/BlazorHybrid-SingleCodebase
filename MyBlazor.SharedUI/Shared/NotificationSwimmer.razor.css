@@ -25,13 +25,13 @@
 .base {
     margin-top: 5px;
     animation-fill-mode: both;
-    background: rgb(104,68,149);
-    background: linear-gradient(0deg, rgba(104,68,149,1) 15%, rgba(120,33,209,1) 56%);
+    background: rgb(65,41,96);
+    background: linear-gradient(180deg, rgba(65,41,96,1) 27%, rgba(31,22,43,1) 100%);
     overflow: hidden;
     border-radius: 5px;
     border-color: darkslateblue;
     border-style: solid;
-    border-width: 2px;
+    border-width: 3px;
 }
 
 .sliding-in {
@@ -49,7 +49,6 @@
 .internal {
     margin-left: 10px;
     margin-top: 10px;
-    margin-bottom: 10px;
     margin-right: 10px;
 }
 
@@ -72,5 +71,5 @@
     position: absolute;
     width: 20px;
     right: 1%;
-    top: 15%;
+    top: 5%;
 }

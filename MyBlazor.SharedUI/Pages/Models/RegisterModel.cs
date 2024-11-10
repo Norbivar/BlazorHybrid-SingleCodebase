@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyBlazor.SharedUI.Pages.Models
 {
-	public class RegisterModel
+	public class LoginRegisterModel
 	{
 		[Required(ErrorMessage = "Username is required")]
 		[MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
@@ -13,9 +14,19 @@ namespace MyBlazor.SharedUI.Pages.Models
 		[MinLength(3, ErrorMessage = "Password must be at least 3 characters")]
 		public string Password { get; set; }
 
-		public RegisterModel ShallowCopy()
+		public LoginRegisterModel ShallowCopy()
 		{
-            return (RegisterModel)MemberwiseClone();
-        }
+			return (LoginRegisterModel)MemberwiseClone();
+		}
+	}
+
+	public class RegisterResultModel
+	{
+		public IEnumerable<string> Errors { get; set; }
+	}
+
+	public class LoginResultModel
+	{
+		public string JWTToken { get; set; }
 	}
 }
