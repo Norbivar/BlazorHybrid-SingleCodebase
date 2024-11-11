@@ -45,7 +45,7 @@
 		}
 
 		var content = new StringContent(JsonSerializer.Serialize(myModel), Encoding.UTF8, "application/json");
-		var response = await HttpClient.PostAsync($"{navigationManager.BaseUri}account/login", content)
+		var response = await HttpClient.PostAsync($"account/login", content)
 			.ConfigureAwait(false);
 
 		if (response.IsSuccessStatusCode)

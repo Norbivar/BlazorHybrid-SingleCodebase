@@ -25,11 +25,11 @@ namespace MyBlazor.Shared.Authentication
 				return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())); // anonymous identity
 			}
 
-			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			try
 			{
-				var response = await _httpClient.GetAsync("account/userinfo");
+				_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+				var response = await _httpClient.GetAsync("account/userinfo");
 				if (response.IsSuccessStatusCode)
 				{
 					var user = await response.Content.ReadFromJsonAsync<Shared.Models.UserModel>();
@@ -44,18 +44,12 @@ namespace MyBlazor.Shared.Authentication
 						var identity = new ClaimsIdentity(claims, "jwtAuth");
 						var userPrincipal = new ClaimsPrincipal(identity);
 
-						_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
 						return new AuthenticationState(userPrincipal);
 					}
 					else
 					{
 						Console.WriteLine("Clientside authentication successful but did not receive model!");
 					}
-				}
-				else
-				{
-					_httpClient.DefaultRequestHeaders.Authorization = null;
 				}
 			}
 			catch
@@ -64,6 +58,7 @@ namespace MyBlazor.Shared.Authentication
 			}
 
 			// If any error occurs, return an anonymous identity
+			_httpClient.DefaultRequestHeaders.Authorization = null;
 			return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
@@ -74,7 +69,7 @@ namespace MyBlazor.Shared.Authentication
 			NotifyAuthenticationStateChanged(authState);
 
 			var result = await authState;
-			return result.User.Claims.Count() != 0;
+			return (result.User.Identity is not null && result.User.Identity.IsAuthenticated);
 		}
 
 		public async Task MarkUserAsLoggedOut()

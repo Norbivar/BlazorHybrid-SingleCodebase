@@ -62,11 +62,11 @@
 
     #helper-chevron {
         color: whitesmoke;
-        width: 15px;
-        height: 15px;
+        width: 5px;
+        height: 5px;
 
         position: absolute;
-        right: 0%;
+        right: 3%;
         top: 50%;
     }
 }
