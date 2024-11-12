@@ -39,23 +39,6 @@
 	{
 		NotificationService.OnNotificationPopupReceived += AddNotificationPopup;
 		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
-
-		// TEST:
-		AddNotificationPopup(new NotificationPopup
-			{
-				Title = "HellO!",
-				Description = "I am testing the popup! lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet",
-				Type = NotificationType.Info,
-				Buttons = new List<NotificationPopup.PopupButtonID> { NotificationPopup.PopupButtonID.Ok, NotificationPopup.PopupButtonID.Cancel}
-			});
-		AddNotificationSwimmer(new NotificationSwimmer
-			{
-				Title = "HellO!",
-				Description = "I am testing the Swimmer! lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet",
-				Type = NotificationType.Info,
-				ShowFor = TimeSpan.FromSeconds(600)
-			});
-
 	}
 
 	public void Dispose()
