@@ -61,8 +61,7 @@ namespace MyBlazor.Shared.Authentication
 			return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
-		public new async Task<bool> TryMarkUserAsAuthenticated(string token)
-		{
+		public override async Task<bool> TryMarkUserAsAuthenticated(string token) 		{
 			await _localStorage.SetItemAsync("jwtToken", token);
 			var authState = GetAuthenticationStateAsync();
 			NotifyAuthenticationStateChanged(authState);
@@ -71,11 +70,11 @@ namespace MyBlazor.Shared.Authentication
 			return (result.User.Identity is not null && result.User.Identity.IsAuthenticated);
 		}
 
-		public async Task TryMarkUserAsLoggedOut()
-		{
-			await _localStorage.RemoveItemAsync("jwtToken");
-			_httpClient.DefaultRequestHeaders.Authorization = null;
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-		}
+		//public async Task TryMarkUserAsLoggedOut()
+		//{
+		//	await _localStorage.RemoveItemAsync("jwtToken");
+		//	_httpClient.DefaultRequestHeaders.Authorization = null;
+		//	NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+		//}
 	}
 }

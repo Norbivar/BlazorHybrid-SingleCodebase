@@ -1,0 +1,44 @@
+﻿@using MyBlazor.Shared.Notifications
+
+<div class="canvas">
+	<div class="base base-size-specific">
+		<table class="internal">
+			<tr>
+				<td class="title">
+					<span class="oi @notificationPopupModel.Icon me-2" aria-hidden="true"></span>
+					<strong>@notificationPopupModel.Title</strong>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<pre class="desc">
+						@notificationPopupModel.Description
+					</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="buttons-row-div">
+						@if (notificationPopupModel.Buttons.Contains(NotificationPopup.PopupButtonID.Cancel))
+						{
+							<div class="button-div">
+								<button class="button" type="button" @onclick="notificationPopupModel.ClickCancel">Cancel</button>
+							</div>
+						}
+						@if (notificationPopupModel.Buttons.Contains(NotificationPopup.PopupButtonID.Ok))
+						{
+							<div class="button-div">
+								<button class="button" type="button" @onclick="notificationPopupModel.ClickOK">OK</button>
+							</div>
+						}
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public required MyBlazor.Shared.Notifications.NotificationPopup notificationPopupModel { get; set; }
+}

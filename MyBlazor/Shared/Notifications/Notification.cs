@@ -23,25 +23,9 @@ namespace MyBlazor.Shared.Notifications
 			}
 		}
 
+		public string Icon { get; set; } = "oi-info";
 		public required string Title { get; set; }
 		public required string Description { get; set; }
 		public NotificationType Type { get; set; } = NotificationType.Info;
-
-		public NotificationBase ShallowCopy()
-		{
-			return (NotificationBase)MemberwiseClone();
-		}
-	}
-
-	public class PopupBase : NotificationBase
-	{
-		[Flags]
-		public enum PopupButtons
-		{
-			Ok = 1 << 0,
-			Cancel = 1 << 1,
-		}
-
-		public PopupButtons Buttons { get; set; }
 	}
 }

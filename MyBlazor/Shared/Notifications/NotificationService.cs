@@ -6,14 +6,29 @@ using System.Threading.Tasks;
 
 namespace MyBlazor.Shared.Notifications
 {
-	public class NotificationService : INotificationService
+    public class NotificationService : INotificationService
 	{
-		public event Action<NotificationSwimmer> OnNotificationPopupReceived;
+		public event Action<NotificationPopup> OnNotificationPopupReceived;
 		public event Action<NotificationSwimmer> OnNotificationSwimmerReceived;
+
+		public void SendNotificationPopup(NotificationPopup popup)
+		{
+			lock (OnNotificationPopupReceived)
+			{
+				OnNotificationPopupReceived?.Invoke(popup);
+			}
+		}
 
 		public void SendNotificationPopup(string title, string description, NotificationType type = NotificationType.Info)
 		{
-			// TODO
+            var notification = new NotificationPopup
+            {
+                Title = title,
+                Description = description,
+                Type = type
+            };
+
+			SendNotificationPopup(notification);
 		}
 
 		public void SendNotificationSwimmer(string title, string description, NotificationType type = NotificationType.Info)

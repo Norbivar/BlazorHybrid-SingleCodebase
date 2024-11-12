@@ -32,6 +32,7 @@
     border-color: darkslateblue;
     border-style: solid;
     border-width: 3px;
+    max-width: 50%;
 }
 
 .sliding-in {
@@ -60,10 +61,10 @@
 }
 
 .desc {
-    font-size: 16px;
-    margin-left: 40px;
-    margin-right: 40px;
+    font-size: 14px;
     color: ghostwhite;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .exit {

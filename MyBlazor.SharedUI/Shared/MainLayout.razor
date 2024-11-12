@@ -1,9 +1,12 @@
-﻿@inherits LayoutComponentBase
-
-@using MyBlazor.Shared.Notifications
-@using MyBlazor.SharedUI.Pages.Models
+﻿@using MyBlazor.Shared.Notifications
+@inherits LayoutComponentBase
 
 @inject INotificationService NotificationService
+
+@if (activePopup is not null)
+{
+	<NotificationPopupWidget notificationPopupModel=@activePopup />
+}
 
 <div class="page">
 	<div class="sidebar">
@@ -13,7 +16,7 @@
 	<div id="swim-lane">
 		@foreach (var notif in notifications)
 		{
-			<NotificationSwimmer NotificationSwimmerModel=@notif />
+			<NotificationSwimmerWidget NotificationSwimmerModel=@notif />
 		}
 	</div>
 
@@ -29,46 +32,71 @@
 </div>
 
 @code {
-	private List<NotificationSwimmerModel> notifications = new List<NotificationSwimmerModel>();
-
-	private async void AddNotificationSwimmer(MyBlazor.Shared.Notifications.NotificationBase notification)
-	{
-		var notif = new NotificationSwimmerModel
-			{
-				Title = notification.Title,
-				Description = notification.Description,
-				Icon = NotificationSwimmerModel.NotificationTypeToIcon(notification.Type)
-			};
-
-		var deleteAfter = TimeSpan.FromSeconds(10);
-
-		notif.ShouldDisappearHandler = new Timer(async state =>
-		{
-			while (notif.HoveredOver && !notif.ManuallyClosed)
-			{
-				await Task.Delay(500);
-			}
-
-			notif.Display = false;
-			await InvokeAsync(StateHasChanged);
-			await Task.Delay(700);
-
-			notifications.Remove(notif);
-			await InvokeAsync(StateHasChanged);
-		}, notif, deleteAfter, Timeout.InfiniteTimeSpan);
-
-		notifications.Add(notif);
-		await InvokeAsync(StateHasChanged);
-	}
+	private List<NotificationSwimmer> notifications = new List<NotificationSwimmer>();
+	private NotificationPopup? activePopup;
 
 	protected override void OnInitialized()
 	{
+		NotificationService.OnNotificationPopupReceived += AddNotificationPopup;
 		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
+
+		// TEST:
+		AddNotificationPopup(new NotificationPopup
+			{
+				Title = "HellO!",
+				Description = "I am testing the popup! lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet",
+				Type = NotificationType.Info,
+				Buttons = new List<NotificationPopup.PopupButtonID> { NotificationPopup.PopupButtonID.Ok, NotificationPopup.PopupButtonID.Cancel}
+			});
+		AddNotificationSwimmer(new NotificationSwimmer
+			{
+				Title = "HellO!",
+				Description = "I am testing the Swimmer! lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet",
+				Type = NotificationType.Info,
+				ShowFor = TimeSpan.FromSeconds(600)
+			});
+
 	}
 
 	public void Dispose()
 	{
-		// Unsubscribe when the component is disposed
+		NotificationService.OnNotificationPopupReceived -= AddNotificationPopup;
 		NotificationService.OnNotificationSwimmerReceived -= AddNotificationSwimmer;
+	}
+
+	private async void ClearPopup()
+	{
+		activePopup = null;
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private async void AddNotificationPopup(NotificationPopup popup)
+	{
+		popup.OnClickedOK += ClearPopup;
+		popup.OnClickedCancel += ClearPopup;
+
+		activePopup = popup;
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private async void AddNotificationSwimmer(NotificationSwimmer notification)
+	{
+		notification.ShouldDisappearHandler = new Timer(async state =>
+		{
+			while (notification.HoveredOver && !notification.ManuallyClosed)
+			{
+				await Task.Delay(500);
+			}
+
+			notification.Display = false;
+			await InvokeAsync(StateHasChanged);
+			await Task.Delay(700);
+
+			notifications.Remove(notification);
+			await InvokeAsync(StateHasChanged);
+		}, notification, notification.ShowFor, Timeout.InfiniteTimeSpan);
+
+		notifications.Add(notification);
+		await InvokeAsync(StateHasChanged);
 	}
 }

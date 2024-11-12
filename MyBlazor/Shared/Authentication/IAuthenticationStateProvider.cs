@@ -14,7 +14,7 @@ namespace MyBlazor.Shared.Authentication
 			throw new NotImplementedException();
 		}
 
-		public async Task<bool> TryMarkUserAsAuthenticated(string token)
+		public virtual async Task<bool> TryMarkUserAsAuthenticated(string token)
 		{
 			throw new NotImplementedException();
 		}

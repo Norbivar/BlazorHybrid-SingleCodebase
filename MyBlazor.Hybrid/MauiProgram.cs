@@ -50,6 +50,7 @@ namespace MyBlazor.Hybrid
 
             builder.Services.AddScoped<IFetchDataService, FetchDataService>();
 			builder.Services.AddSingleton<INotificationService, NotificationService>();
+            builder.Services.AddScoped<AuthenticationStateProvider, JWTAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthenticationStateProvider, JWTAuthenticationStateProvider>();
 			builder.Services.AddScoped<HttpHubService>();
 

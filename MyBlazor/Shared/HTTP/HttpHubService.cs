@@ -74,6 +74,7 @@ namespace MyBlazor.Shared.HTTP
 					Value = valueToReturn
 				};
 				#endregion
+
 			}
 		}
 		public class HTTPRes<T>

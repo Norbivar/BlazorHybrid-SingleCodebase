@@ -118,14 +118,11 @@ namespace MyBlazor.Server.Controllers
 		[OutputCache(NoStore = true)]
 		public async Task<IActionResult> UserInfo()
 		{
-			_logger.Log(LogLevel.Information, "Userinfo called!");
 			if (HttpContext.User is not null) // JWT token was validated
 			{
-				_logger.Log(LogLevel.Information, "Userinfo: Context user is not null!");
 				var email = HttpContext.User.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault();
 				if (email is not null)
 				{
-					_logger.Log(LogLevel.Information, "Userinfo: Context user email: {0}!", email.Value);
 					var user = await _userManager.FindByEmailAsync(email.Value);
 					if (user is not null && user.Email is not null)
 					{

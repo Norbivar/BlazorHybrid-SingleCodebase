@@ -1,4 +1,4 @@
-﻿@using MyBlazor.SharedUI.Pages.Models
+﻿@using MyBlazor.Shared.Notifications
 
 <div class="base @(notificationSwimmerModel.Display ? "sliding-in" : "sliding-out")" @onmouseover="MouseOver" @onmouseout="MouseOut">
 	<table class="internal">
@@ -15,8 +15,8 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="desc">
-				<pre>
+			<td>
+				<pre class="desc">
 					@notificationSwimmerModel.Description
 				</pre>
 			</td>
@@ -26,7 +26,7 @@
 
 @code {
 	[Parameter]
-	public required NotificationSwimmerModel notificationSwimmerModel { get; set; }
+	public required NotificationSwimmer notificationSwimmerModel { get; set; }
 
 	void MouseOver(MouseEventArgs e) { notificationSwimmerModel.HoveredOver = true; }
 	void MouseOut(MouseEventArgs e) { notificationSwimmerModel.HoveredOver = false; }
