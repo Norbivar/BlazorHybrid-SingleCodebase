@@ -1,5 +1,6 @@
 ﻿@page "/authtest"
 
+@using MyBlazor.Shared.Authentication
 @using MyBlazor.Shared.Notifications
 @using MyBlazor.SharedUI.Pages.Models
 @using System.Text.Json
@@ -10,7 +11,7 @@
 @using System.Security.Claims
 
 @inject HttpClient HttpClient
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthenticationStateProvider AuthenticationStateProvider
 
 
 <PageTitle>Auth Test</PageTitle>

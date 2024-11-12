@@ -1,0 +1,46 @@
+﻿@using MyBlazor.Shared.Notifications
+@using MyBlazor.SharedUI.Pages.Models
+
+<div class="base">
+	<table class="internal">
+		<tr>
+			<td class="title">
+				<span class="oi @notificationPopupModel.Icon me-2" aria-hidden="true"></span>
+				<strong>@notificationPopupModel.Title</strong>
+			</td>
+
+			<td class="exit">
+				<div style="cursor: pointer;">
+					<span class="oi oi-x" aria-hidden="true"></span>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="desc">
+				<pre>
+					@notificationPopupModel.Description
+				</pre>
+			</td>
+		</tr>
+		<tr>
+			@if ((notificationPopupModel.Buttons & PopupBase.PopupButtons.Cancel) != 0)
+			{
+				<td>
+					<button type="button">Cancel</button>
+				</td>
+			}
+
+			@if ((notificationPopupModel.Buttons & PopupBase.PopupButtons.Ok) != 0)
+			{
+				<td>
+					<button type="button">OK</button>
+				</td>
+			}
+		</tr>
+	</table>
+</div>
+
+@code {
+	[Parameter]
+	public required NotificationPopupModel notificationPopupModel { get; set; }
+}

@@ -11,15 +11,37 @@ namespace MyBlazor.Shared.Notifications
 		Info,
 		Error
 	}
-	public class NotificationSwimmer
+	public class NotificationBase
 	{
+		public static string NotificationTypeToIcon(NotificationType type)
+		{
+			switch (type)
+			{
+				case NotificationType.Info: return "oi-info";
+				case NotificationType.Error: return "oi-warning";
+				default: return "";
+			}
+		}
+
 		public required string Title { get; set; }
 		public required string Description { get; set; }
 		public NotificationType Type { get; set; } = NotificationType.Info;
 
-		public NotificationSwimmer ShallowCopy()
+		public NotificationBase ShallowCopy()
 		{
-			return (NotificationSwimmer)MemberwiseClone();
+			return (NotificationBase)MemberwiseClone();
 		}
+	}
+
+	public class PopupBase : NotificationBase
+	{
+		[Flags]
+		public enum PopupButtons
+		{
+			Ok = 1 << 0,
+			Cancel = 1 << 1,
+		}
+
+		public PopupButtons Buttons { get; set; }
 	}
 }

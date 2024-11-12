@@ -1,17 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using MyBlazor.Server.Database;
-using MyBlazor.Shared;
 using MyBlazor.Shared.Models;
-using MyBlazor.SharedUI.Pages.Models;
+using MyBlazor.Shared.Pages.Models;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MyBlazor.Server.Controllers
 {
@@ -131,7 +127,7 @@ namespace MyBlazor.Server.Controllers
 				{
 					_logger.Log(LogLevel.Information, "Userinfo: Context user email: {0}!", email.Value);
 					var user = await _userManager.FindByEmailAsync(email.Value);
-					if (user is not null)
+					if (user is not null && user.Email is not null)
 					{
 						_logger.Log(LogLevel.Information, "Userinfo: Retreiving user data!");
 						var userInfo = new UserModel

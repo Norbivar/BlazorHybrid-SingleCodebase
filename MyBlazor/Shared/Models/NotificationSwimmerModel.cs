@@ -3,18 +3,8 @@ using MyBlazor.Shared.Notifications;
 
 namespace MyBlazor.SharedUI.Pages.Models
 {
-	public class NotificationSwimmerModel : NotificationSwimmer
+	public class NotificationSwimmerModel : NotificationBase
 	{
-		public static string NotificationTypeToIcon(NotificationType type)
-		{
-			switch (type)
-			{
-				case NotificationType.Info: return "oi-info";
-				case NotificationType.Error: return "oi-warning";
-				default: return "";
-			}
-		}
-
 		public bool Display { get; set; } = true;
 		public bool HoveredOver { get; set; } = false;
 		public bool ManuallyClosed { get; set; } = false;
@@ -33,6 +23,6 @@ namespace MyBlazor.SharedUI.Pages.Models
 			}
 		}
 
-		public System.Threading.Timer ShouldDisappearHandler { get; set; }
+		public System.Threading.Timer? ShouldDisappearHandler { get; set; }
 	}
 }

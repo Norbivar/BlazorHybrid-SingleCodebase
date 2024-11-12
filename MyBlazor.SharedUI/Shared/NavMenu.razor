@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using MyBlazor.Shared.Authentication
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthenticationStateProvider AuthenticationStateProvider
 
 <div class="top-row ps-3 navbar navbar-dark">
 	<div class="container-fluid">
@@ -79,7 +80,7 @@
 		collapseNavMenu = !collapseNavMenu;
 	}
 
-	private async void SetLogged(Task<AuthenticationState> handler)
+	private async void UpdateNavMenu(Task<AuthenticationState> handler)
 	{
 		var authResult = await handler;
 		isLoggedIn = (authResult.User.Identity is not null && authResult.User.Identity.IsAuthenticated);
@@ -89,12 +90,11 @@
 
 	protected override void OnInitialized()
 	{
-		AuthenticationStateProvider.AuthenticationStateChanged += SetLogged;
+		AuthenticationStateProvider.AuthenticationStateChanged += UpdateNavMenu;
 	}
 
 	public void Dispose()
 	{
-		// Unsubscribe when the component is disposed
-		AuthenticationStateProvider.AuthenticationStateChanged -= SetLogged;
+		AuthenticationStateProvider.AuthenticationStateChanged -= UpdateNavMenu;
 	}
 }

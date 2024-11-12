@@ -1,20 +1,23 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using MyBlazor.Shared.HTTP;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 
 namespace MyBlazor.Shared.Authentication
 {
-	public class JWTAuthenticationStateProvider : AuthenticationStateProvider
+	public class JWTAuthenticationStateProvider : IAuthenticationStateProvider
 	{
 		private readonly ILocalStorageService _localStorage;
 		private readonly HttpClient _httpClient;
+		private readonly HttpHubService _httpHub;
 
-		public JWTAuthenticationStateProvider(ILocalStorageService localStorage, HttpClient httpClient)
+		public JWTAuthenticationStateProvider(ILocalStorageService localStorage, HttpClient httpClient, HttpHubService httpHub)
 		{
 			_localStorage = localStorage;
 			_httpClient = httpClient;
+			_httpHub = httpHub;
 		}
 
 		public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -29,27 +32,23 @@ namespace MyBlazor.Shared.Authentication
 			{
 				_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-				var response = await _httpClient.GetAsync("account/userinfo");
-				if (response.IsSuccessStatusCode)
+				var response = await _httpHub.Get.UserInfo();
+				if (response.Success && response.Value is not null)
 				{
-					var user = await response.Content.ReadFromJsonAsync<Shared.Models.UserModel>();
-					if (user is not null)
+					var claims = new[]
 					{
-						var claims = new[]
-						{
-							new Claim(ClaimTypes.Name, user.Email),
-							new Claim(ClaimTypes.Email, user.Email)
-						};
+						new Claim(ClaimTypes.Name, response.Value.Email),
+						new Claim(ClaimTypes.Email, response.Value.Email)
+					};
 
-						var identity = new ClaimsIdentity(claims, "jwtAuth");
-						var userPrincipal = new ClaimsPrincipal(identity);
+					var identity = new ClaimsIdentity(claims, "jwtAuth");
+					var userPrincipal = new ClaimsPrincipal(identity);
 
-						return new AuthenticationState(userPrincipal);
-					}
-					else
-					{
-						Console.WriteLine("Clientside authentication successful but did not receive model!");
-					}
+					return new AuthenticationState(userPrincipal);
+				}
+				else
+				{
+					Console.WriteLine("Clientside authentication successful but did not receive model!");
 				}
 			}
 			catch
@@ -62,7 +61,7 @@ namespace MyBlazor.Shared.Authentication
 			return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
-		public async Task<bool> MarkUserAsAuthenticated(string token)
+		public new async Task<bool> TryMarkUserAsAuthenticated(string token)
 		{
 			await _localStorage.SetItemAsync("jwtToken", token);
 			var authState = GetAuthenticationStateAsync();
@@ -72,7 +71,7 @@ namespace MyBlazor.Shared.Authentication
 			return (result.User.Identity is not null && result.User.Identity.IsAuthenticated);
 		}
 
-		public async Task MarkUserAsLoggedOut()
+		public async Task TryMarkUserAsLoggedOut()
 		{
 			await _localStorage.RemoveItemAsync("jwtToken");
 			_httpClient.DefaultRequestHeaders.Authorization = null;

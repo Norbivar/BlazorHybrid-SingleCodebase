@@ -9,7 +9,7 @@ namespace MyBlazor.Shared.Models
 	// The information stored on the CLIENT-SIDE. Mainly used to store the "logged in" person.
 	public class UserModel
 	{
-		public int Id { get; set; }
-		public string Email { get; set; }
+		public required int Id { get; set; }
+		public required string Email { get; set; }
 	}
 }

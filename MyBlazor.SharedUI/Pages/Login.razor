@@ -2,41 +2,43 @@
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using MyBlazor.Shared.Authentication
+@using MyBlazor.Shared.HTTP
 @using MyBlazor.Shared.Notifications
-@using MyBlazor.SharedUI.Pages.Models
+@using MyBlazor.Shared.Pages.Models
 @using System.Text.Json
 @using System.Text
 @using Blazored.LocalStorage
 @using System.Net.Http.Headers
 
-@inject HttpClient HttpClient
 @inject NavigationManager navigationManager;
 @inject INotificationService NotificationService
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IAuthenticationStateProvider AuthStateProvider
+@inject HttpHubService HttpHub
 
 <h3>Login</h3>
 
-<EditForm Model="@myModel" OnValidSubmit="HandleSubmit">
+<form method="post" @onsubmit="HandleSubmit">
 	<AntiforgeryToken />
 
 	<fieldset class="grid-container">
 		<label for="email">E-mail:</label>
-		<input type="text" name="email" @bind=myModel.Email />
+		<input type="text" name="email" @bind=email />
 
 		<label for="pass">Password:</label>
-		<input type="password" name="pass" @bind=myModel.Password />
+		<input type="password" name="pass" @bind=password />
 
 		<input type="submit" value="Login">
 	</fieldset>
-</EditForm>
+</form>
 
 @code {
-	private LoginRegisterModel myModel = new LoginRegisterModel();
+	private string email = "";
+	private string password = "";
 
 	private async Task HandleSubmit()
 	{
-		var isEmailValid = myModel.Email.Length >= 3 || !myModel.Email.Contains('@');
-		var isPasswordValid = myModel.Password.Length >= 3;
+		var isEmailValid = email.Length >= 3 || !email.Contains('@');
+		var isPasswordValid = password.Length >= 3;
 
 		if (!isEmailValid || !isPasswordValid)
 		{
@@ -44,33 +46,24 @@
 			return;
 		}
 
-		var content = new StringContent(JsonSerializer.Serialize(myModel), Encoding.UTF8, "application/json");
-		var response = await HttpClient.PostAsync($"account/login", content)
-			.ConfigureAwait(false);
-
-		if (response.IsSuccessStatusCode)
-		{
-			var responseContent = await response.Content.ReadAsStringAsync();
-			var jwtToken = JsonSerializer.Deserialize<LoginResultModel>(responseContent);
-			if (jwtToken != null && jwtToken.JWTToken.Count() > 0)
+		var loginResult = await HttpHub.Post.Login(new LoginRegisterModel
 			{
-				if (AuthStateProvider is JWTAuthenticationStateProvider)
-				{
-					var result = await (AuthStateProvider as JWTAuthenticationStateProvider).MarkUserAsAuthenticated(jwtToken.JWTToken);
-					if (result)
-					{
-						NotificationService.SendNotificationSwimmer("Success", "Login successful!");
-					}
-					else
-					{
-						NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error);
-					}
-				}
+				Email = email,
+				Password = password
+			});
+
+		if (loginResult.Success && loginResult.Value is not null && loginResult.Value.JWTToken is not null)
+		{
+			var result = await AuthStateProvider.TryMarkUserAsAuthenticated(loginResult.Value.JWTToken);
+			if (result)
+			{
+				NotificationService.SendNotificationSwimmer("Success", "Login successful!");
 			}
 			else
 			{
-				Console.WriteLine("Error retrieving JWT Token!");
+				NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error);
 			}
+
 		}
 		else
 		{
