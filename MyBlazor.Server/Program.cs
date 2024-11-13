@@ -7,9 +7,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+//builder.Services.AddControllersWithViews();
+//builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddDbContext<UsersContext>(
@@ -68,8 +67,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
-app.MapControllers();
+//app.MapRazorPages();
 app.MapFallbackToFile("index.html");
+app.MapControllers();
 
 app.Run();

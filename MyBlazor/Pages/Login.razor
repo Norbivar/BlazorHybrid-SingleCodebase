@@ -54,16 +54,11 @@
 
 		if (loginResult.Success && loginResult.Value is not null && loginResult.Value.JWTToken is not null)
 		{
-			var result = await AuthStateProvider.TryMarkUserAsAuthenticated(loginResult.Value.JWTToken);
-			if (result)
-			{
-				NotificationService.SendNotificationSwimmer("Success", "Login successful!");
-			}
-			else
-			{
-				NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error);
-			}
+			var result = await AuthStateProvider.TryLoginWith(loginResult.Value.JWTToken);
 
+			result.Match(
+				() => NotificationService.SendNotificationSwimmer("Success", "Login successful!"),
+				err => NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error));
 		}
 		else
 		{

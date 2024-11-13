@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyBlazor.Models
 {
-	// The information stored on the CLIENT-SIDE. Mainly used to store the "logged in" person.
+	// The information retrieved by the client when logging in. Used to store the "logged in" person.
 	public class UserModel
 	{
 		public required int Id { get; set; }

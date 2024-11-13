@@ -31,28 +31,15 @@ namespace MyBlazor.Hybrid
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("Production API") });
 #endif
 			builder.Services.AddBlazoredLocalStorage();
-			builder.Services.AddScoped(async sp =>
-			{
-				var client = sp.GetRequiredService<HttpClient>();
-				var localStorage = sp.GetRequiredService<ILocalStorageService>();
-
-				var result = await localStorage.GetItemAsync<string>("jwtToken");
-				if (result != null && result.Count() > 0)
-				{
-					client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result);
-				}
-
-				return client;
-			});
 
             builder.Services.AddCascadingAuthenticationState();
 			builder.Services.AddAuthorizationCore();
 
-            builder.Services.AddScoped<IFetchDataService, FetchDataService>();
-			builder.Services.AddSingleton<INotificationService, NotificationService>();
-            builder.Services.AddScoped<AuthenticationStateProvider, JWTAuthenticationStateProvider>();
-            builder.Services.AddScoped<IAuthenticationStateProvider, JWTAuthenticationStateProvider>();
-			builder.Services.AddScoped<HttpHubService>();
+            builder.Services.AddScoped<IFetchDataService, FetchDataService>()
+                .AddSingleton<INotificationService, NotificationService>()
+                .AddScoped<AuthenticationStateProvider, JWTAuthenticationStateProvider>()
+                .AddScoped<IAuthenticationStateProvider, JWTAuthenticationStateProvider>()
+                .AddScoped<HttpHubService>();
 
 			return builder.Build();
         }

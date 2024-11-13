@@ -14,7 +14,12 @@ namespace MyBlazor.Authentication
 			throw new NotImplementedException();
 		}
 
-		public virtual async Task<bool> TryMarkUserAsAuthenticated(string token)
+		public virtual async Task<Result> TryLogin()
+		{
+			throw new NotImplementedException();
+		}
+
+		public virtual async Task<Result> TryLoginWith(string token)
 		{
 			throw new NotImplementedException();
 		}

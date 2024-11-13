@@ -9,65 +9,100 @@ namespace MyBlazor.Authentication
 {
 	public class JWTAuthenticationStateProvider : IAuthenticationStateProvider
 	{
+		private readonly string AuthenticationTokenType = "jwtToken";
+
 		private readonly ILocalStorageService _localStorage;
 		private readonly HttpClient _httpClient;
 		private readonly HttpHubService _httpHub;
+		static private (string token, AuthenticationState state) activeAuthenticationState;
 
 		public JWTAuthenticationStateProvider(ILocalStorageService localStorage, HttpClient httpClient, HttpHubService httpHub)
 		{
 			_localStorage = localStorage;
 			_httpClient = httpClient;
 			_httpHub = httpHub;
+			AuthenticationStateChanged += OnAuthenticationStateChanged;
 		}
 
+		private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+		{
+		}
+
+		// This is called when logging in, but also every time 
 		public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 		{
-			var token = await _localStorage.GetItemAsync<string>("jwtToken");
-			if (string.IsNullOrEmpty(token))
+			var token = await _localStorage.GetItemAsync<string>(AuthenticationTokenType);
+			if (!string.IsNullOrEmpty(token))
 			{
-				return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())); // anonymous identity
-			}
-
-			try
-			{
-				_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-				var response = await _httpHub.Get.UserInfo();
-				if (response.Success && response.Value is not null)
+				if (token == activeAuthenticationState.token && activeAuthenticationState.state is not null)
 				{
-					var claims = new[]
-					{
-						new Claim(ClaimTypes.Name, response.Value.Email),
-						new Claim(ClaimTypes.Email, response.Value.Email)
-					};
-
-					var identity = new ClaimsIdentity(claims, "jwtAuth");
-					var userPrincipal = new ClaimsPrincipal(identity);
-
-					return new AuthenticationState(userPrincipal);
+					return activeAuthenticationState.state; // cached path
 				}
 				else
 				{
-					Console.WriteLine("Clientside authentication successful but did not receive model!");
+					try
+					{
+						_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+						var response = await _httpHub.Get.UserInfo();
+
+						if (response.Success && response.Value is not null)
+						{
+							var claims = new[]
+							{
+							new Claim(ClaimTypes.Name, response.Value.Email),
+							new Claim(ClaimTypes.Email, response.Value.Email)
+						};
+
+							var identity = new ClaimsIdentity(claims, "jwtAuth");
+							var userPrincipal = new ClaimsPrincipal(identity);
+
+							activeAuthenticationState.token = token;
+							activeAuthenticationState.state = new AuthenticationState(userPrincipal);
+							return activeAuthenticationState.state;
+						}
+						else
+						{
+							Console.WriteLine("Failed to validate JWT token!");
+						}
+					}
+					catch
+					{
+						Console.WriteLine("Error occured in GetAuthenticationStateAsync");
+					}
 				}
-			}
-			catch
-			{
-				Console.WriteLine("Error occured in GetAuthenticationStateAsync");
 			}
 
 			// If any error occurs, return an anonymous identity
 			_httpClient.DefaultRequestHeaders.Authorization = null;
+			await _localStorage.RemoveItemAsync(AuthenticationTokenType); // Login was not successful, so delete the token to clean up
+
 			return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
-		public override async Task<bool> TryMarkUserAsAuthenticated(string token) 		{
-			await _localStorage.SetItemAsync("jwtToken", token);
-			var authState = GetAuthenticationStateAsync();
-			NotifyAuthenticationStateChanged(authState);
+		public override async Task<Result> TryLogin()
+		{
+			var token = await _localStorage.GetItemAsync<string>(AuthenticationTokenType);
+			if (string.IsNullOrEmpty(token))
+			{
+				Result.Failure(Error.NotFound("Token", "Token not found in local storage!"));
+			}
 
+			var authState = GetAuthenticationStateAsync();
 			var result = await authState;
-			return (result.User.Identity is not null && result.User.Identity.IsAuthenticated);
+
+			if (result.User != null && result.User.Identity != null && result.User.Identity.IsAuthenticated)
+			{
+				NotifyAuthenticationStateChanged(authState);
+				return Result.Success();
+			}
+
+			return Result.Failure(Error.Failure("Invalid", "Token was not valid, user is not authenticated."));
+		}
+
+		public override async Task<Result> TryLoginWith(string token)
+		{
+			await _localStorage.SetItemAsync(AuthenticationTokenType, token);
+			return await TryLogin();
 		}
 
 		//public async Task TryMarkUserAsLoggedOut()

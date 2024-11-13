@@ -141,10 +141,27 @@ namespace MyBlazor
 			Action<T> onSuccess,
 			Action<Error> onFailure)
 		{
-			if (result.IsSuccess) {
+			if (result.IsSuccess)
+			{
 				onSuccess(result.Value);
 			}
-			else {
+			else
+			{
+				onFailure(result.Error!);
+			}
+		}
+
+		public static void Match(
+			this Result result,
+			Action onSuccess,
+			Action<Error> onFailure)
+		{
+			if (result.IsSuccess)
+			{
+				onSuccess();
+			}
+			else
+			{
 				onFailure(result.Error!);
 			}
 		}

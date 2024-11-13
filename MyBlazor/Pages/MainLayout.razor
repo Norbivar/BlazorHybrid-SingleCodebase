@@ -1,9 +1,11 @@
 ﻿@namespace MyBlazor.Pages
 
+@using MyBlazor.Authentication
 @using MyBlazor.Notifications
 @inherits LayoutComponentBase
 
 @inject INotificationService NotificationService
+@inject IAuthenticationStateProvider AuthenticationStateProvider
 
 @if (activePopup is not null)
 {
@@ -34,11 +36,13 @@
 </div>
 
 @code {
-	private List<NotificationSwimmer> notifications = new List<NotificationSwimmer>();
-	private NotificationPopup? activePopup;
+    private List<NotificationSwimmer> notifications = new List<NotificationSwimmer>();
+    private NotificationPopup? activePopup;
 
-	protected override void OnInitialized()
-	{
+	protected override async Task OnInitializedAsync()
+    {
+        await AuthenticationStateProvider.TryLogin();
+
 		NotificationService.OnNotificationPopupReceived += AddNotificationPopup;
 		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
 	}
