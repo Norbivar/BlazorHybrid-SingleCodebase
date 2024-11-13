@@ -34,6 +34,7 @@
 
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+	  <PublishAot>False</PublishAot>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -68,8 +69,11 @@
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.92" />
 	  <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.92" />
-	  <ProjectReference Include="..\MyBlazor.SharedUI\MyBlazor.SharedUI.csproj" />
-	  <ProjectReference Include="..\MyBlazor\Shared\MyBlazor.Shared.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MyBlazor\MyBlazor.csproj" />
 	</ItemGroup>
 
 

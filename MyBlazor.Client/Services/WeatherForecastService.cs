@@ -1,7 +1,7 @@
 ﻿using MyBlazor;
 using System.Net.Http.Json;
 
-namespace MyBlazor.Hybrid.Services;
+namespace MyBlazor.Client.Services;
 public class FetchDataService : IFetchDataService
 {
     private readonly HttpClient http;

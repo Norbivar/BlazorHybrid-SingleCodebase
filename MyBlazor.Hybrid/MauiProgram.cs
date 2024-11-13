@@ -1,9 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using MyBlazor.Hybrid.Services;
-using MyBlazor.Shared.Authentication;
-using MyBlazor.Shared.HTTP;
-using MyBlazor.Shared.Notifications;
+using MyBlazor.Authentication;
+using MyBlazor.HTTP;
+using MyBlazor.Notifications;
 using System.Net.Http.Headers;
 
 namespace MyBlazor.Hybrid
