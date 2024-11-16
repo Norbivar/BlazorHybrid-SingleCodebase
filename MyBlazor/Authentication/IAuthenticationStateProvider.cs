@@ -14,12 +14,12 @@ namespace MyBlazor.Authentication
 			throw new NotImplementedException();
 		}
 
-		public virtual async Task<Result> TryLogin()
+		public virtual async Task<Result> TryLoginAsync()
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual async Task<Result> TryLoginWith(string token)
+		public virtual async Task<Result> TryLoginWithTokenAsync(string token)
 		{
 			throw new NotImplementedException();
 		}

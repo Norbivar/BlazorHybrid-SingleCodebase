@@ -1,16 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using MyBlazor.Server.Database;
 using System.Text;
-using System.Text.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args);
 
-// Add services to the container.
-//builder.Services.AddControllersWithViews();
-//builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+//builder.Services.AddRazorComponents()
+//				.AddInteractiveServerComponents();
 
 builder.Services.AddDbContext<UsersContext>(
 		options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -44,13 +42,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddControllers()
 	.AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
 
-builder.Logging.AddSimpleConsole(options =>
-{
-	options.IncludeScopes = false;
-	options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
-	options.SingleLine = true;
-	options.TimestampFormat = "HH:mm:ss ";
-});
+//builder.Services.ConfigureHttpJsonOptions(options =>
+//{
+//	options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+//});
+
+builder.WebHost.UseKestrelHttpsConfiguration();
 
 var app = builder.Build();
 
@@ -62,8 +59,7 @@ if (app.Environment.IsDevelopment())
 else
 {
 	app.UseExceptionHandler("/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-	app.UseHsts();
+	app.UseHsts(); // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
 app.UseHttpsRedirection();
@@ -76,8 +72,30 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.MapRazorPages();
 app.MapFallbackToFile("index.html");
 app.MapControllers();
 
+//var sampleTodos = new Todo[] {
+//	new(1, "Walk the dog"),
+//	new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
+//	new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
+//	new(4, "Clean the bathroom"),
+//	new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
+//};
+
+//var todosApi = app.MapGroup("/todos");
+//todosApi.MapGet("/", () => sampleTodos);
+//todosApi.MapGet("/{id}", (int id) =>
+//	sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
+//		? Results.Ok(todo)
+//		: Results.NotFound());
+
 app.Run();
+
+//public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
+
+//[JsonSerializable(typeof(Todo[]))]
+//internal partial class AppJsonSerializerContext : JsonSerializerContext
+//{
+
+//}

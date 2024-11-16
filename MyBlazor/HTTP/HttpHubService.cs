@@ -1,11 +1,6 @@
 ﻿using MyBlazor.Models;
 using System.Text.Json;
 using System.Text;
-using MyBlazor.HTTP;
-using static MyBlazor.HTTP.HttpHubService;
-using static System.Net.WebRequestMethods;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text.Json.Serialization.Metadata;
 
 namespace MyBlazor.HTTP

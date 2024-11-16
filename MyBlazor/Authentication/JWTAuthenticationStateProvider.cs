@@ -26,6 +26,7 @@ namespace MyBlazor.Authentication
 
 		private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
 		{
+			await task;
 		}
 
 		// This is called when logging in, but also every time 
@@ -49,15 +50,14 @@ namespace MyBlazor.Authentication
 						{
 							var claims = new[]
 							{
-							new Claim(ClaimTypes.Name, response.Value.Email),
-							new Claim(ClaimTypes.Email, response.Value.Email)
-						};
+								new Claim(ClaimTypes.Name, response.Value.Email),
+								new Claim(ClaimTypes.Email, response.Value.Email)
+							};
 
 							var identity = new ClaimsIdentity(claims, "jwtAuth");
 							var userPrincipal = new ClaimsPrincipal(identity);
 
-							activeAuthenticationState.token = token;
-							activeAuthenticationState.state = new AuthenticationState(userPrincipal);
+							activeAuthenticationState = (token, new AuthenticationState(userPrincipal));
 							return activeAuthenticationState.state;
 						}
 						else
@@ -79,7 +79,7 @@ namespace MyBlazor.Authentication
 			return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
-		public override async Task<Result> TryLogin()
+		public override async Task<Result> TryLoginAsync()
 		{
 			var token = await _localStorage.GetItemAsync<string>(AuthenticationTokenType);
 			if (string.IsNullOrEmpty(token))
@@ -99,10 +99,10 @@ namespace MyBlazor.Authentication
 			return Result.Failure(Error.Failure("Invalid", "Token was not valid, user is not authenticated."));
 		}
 
-		public override async Task<Result> TryLoginWith(string token)
+		public override async Task<Result> TryLoginWithTokenAsync(string token)
 		{
 			await _localStorage.SetItemAsync(AuthenticationTokenType, token);
-			return await TryLogin();
+			return await TryLoginAsync();
 		}
 
 		//public async Task TryMarkUserAsLoggedOut()

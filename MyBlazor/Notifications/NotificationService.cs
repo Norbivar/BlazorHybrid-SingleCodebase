@@ -6,27 +6,30 @@ using System.Threading.Tasks;
 
 namespace MyBlazor.Notifications
 {
-    public class NotificationService : INotificationService
+	public class NotificationService : INotificationService
 	{
-		public event Action<NotificationPopup> OnNotificationPopupReceived;
-		public event Action<NotificationSwimmer> OnNotificationSwimmerReceived;
+		public event Action<NotificationPopup>? OnNotificationPopupReceived;
+		public event Action<NotificationSwimmer>? OnNotificationSwimmerReceived;
 
 		public void SendNotificationPopup(NotificationPopup popup)
 		{
-			lock (OnNotificationPopupReceived)
+			if (OnNotificationPopupReceived is not null)
 			{
-				OnNotificationPopupReceived?.Invoke(popup);
+				lock (OnNotificationPopupReceived)
+				{
+					OnNotificationPopupReceived.Invoke(popup);
+				}
 			}
 		}
 
 		public void SendNotificationPopup(string title, string description, NotificationType type = NotificationType.Info)
 		{
-            var notification = new NotificationPopup
-            {
-                Title = title,
-                Description = description,
-                Type = type
-            };
+			var notification = new NotificationPopup
+			{
+				Title = title,
+				Description = description,
+				Type = type
+			};
 
 			SendNotificationPopup(notification);
 		}
@@ -40,9 +43,12 @@ namespace MyBlazor.Notifications
 				Type = type
 			};
 
-			lock (OnNotificationSwimmerReceived)
+			if (OnNotificationSwimmerReceived is not null)
 			{
-				OnNotificationSwimmerReceived?.Invoke(notification);
+				lock (OnNotificationSwimmerReceived)
+				{
+					OnNotificationSwimmerReceived.Invoke(notification);
+				}
 			}
 		}
 	}

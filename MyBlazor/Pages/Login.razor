@@ -54,7 +54,7 @@
 
 		if (loginResult.Success && loginResult.Value is not null && loginResult.Value.JWTToken is not null)
 		{
-			var result = await AuthStateProvider.TryLoginWith(loginResult.Value.JWTToken);
+			var result = await AuthStateProvider.TryLoginWithTokenAsync(loginResult.Value.JWTToken);
 
 			result.Match(
 				() => NotificationService.SendNotificationSwimmer("Success", "Login successful!"),

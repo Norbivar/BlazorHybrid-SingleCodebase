@@ -41,7 +41,7 @@
 
 	protected override async Task OnInitializedAsync()
     {
-        await AuthenticationStateProvider.TryLogin();
+        await AuthenticationStateProvider.TryLoginAsync();
 
 		NotificationService.OnNotificationPopupReceived += AddNotificationPopup;
 		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
