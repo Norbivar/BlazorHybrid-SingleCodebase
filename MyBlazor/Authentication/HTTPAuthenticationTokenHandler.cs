@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyBlazor.Models
+namespace MyBlazor.Authentication
 {
-	public class UserAuthTokenModel
+	public class HTTPAuthenticationTokenHandler : DelegatingHandler
 	{
-		public required string Token { get; set; }
 	}
 }

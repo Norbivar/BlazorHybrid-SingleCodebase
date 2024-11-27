@@ -51,5 +51,16 @@ namespace MyBlazor.Notifications
 				}
 			}
 		}
+
+		public void SendNotificationSwimmer(NotificationSwimmer swimmer)
+		{
+			if (OnNotificationSwimmerReceived is not null)
+			{
+				lock (OnNotificationSwimmerReceived)
+				{
+					OnNotificationSwimmerReceived.Invoke(swimmer);
+				}
+			}
+		}
 	}
 }

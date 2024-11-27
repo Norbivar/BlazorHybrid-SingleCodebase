@@ -13,12 +13,7 @@
         public event Action? OnClickedOK;
         public event Action? OnClickedCancel;
 
-        private TaskCompletionSource<PopupButtonID> _popupCompletionSource;
-
-        public NotificationPopup()
-        {
-            _popupCompletionSource = new TaskCompletionSource<PopupButtonID>();
-        }
+        private TaskCompletionSource<PopupButtonID> _popupCompletionSource = new TaskCompletionSource<PopupButtonID>();
 
         public void ClickOK()
         {

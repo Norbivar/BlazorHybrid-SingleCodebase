@@ -2,6 +2,10 @@
 
 namespace MyBlazor.Models
 {
+	public class EmptyModel
+	{
+	}
+
 	public class LoginRegisterModel
 	{
 		public required string Email { get; set; }

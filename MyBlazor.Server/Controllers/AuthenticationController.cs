@@ -7,6 +7,7 @@ using MyBlazor.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyBlazor.Server.Controllers
 {
@@ -34,14 +35,16 @@ namespace MyBlazor.Server.Controllers
 			_configuration = configuration;
 		}
 
-		private string GenerateJwtToken(string email, User user)
+		private string GenerateJwtToken(User user)
 		{
 			var claims = new[]
 			{
-				new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-				new Claim(JwtRegisteredClaimNames.Email, user.Email),
-				new Claim(JwtRegisteredClaimNames.NameId, user.UserName),
+				new Claim(ClaimTypes.Name, user.Name),
+				new Claim(ClaimTypes.Email, user.Email),
+				new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+				//new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+				//new Claim(JwtRegisteredClaimNames.Email, user.Email),
 			};
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]));
@@ -52,28 +55,30 @@ namespace MyBlazor.Server.Controllers
 				audience: _configuration["Jwt:Audience"],
 				claims: claims,
 				expires: DateTime.Now.AddHours(1),
+				//expires: DateTime.Now.AddSeconds(10),
 				signingCredentials: creds
 			);
 
-			return new JwtSecurityTokenHandler().WriteToken(token);
+			var tokenHandler = new JwtSecurityTokenHandler();
+			return tokenHandler.WriteToken(token);
 		}
 
-		[HttpPost]
-		[Route("login")]
+		[HttpPost, Route("login")]
 		public async Task<IActionResult> Login([FromBody] LoginRegisterModel data)
 		{
 			var user = await _userManager.FindByEmailAsync(data.Email);
 			if (user != null && await _userManager.CheckPasswordAsync(user, data.Password))
 			{
 				_logger.Log(LogLevel.Information, "Logging in to account: {0}", data.Email);
-				var token = GenerateJwtToken(data.Email, user);
-				return Ok(new { JWTToken = token });
+				return Ok(new
+				{
+					JWTToken = GenerateJwtToken(user)
+				});
 			}
 			return Unauthorized();
 		}
 
-		[HttpPost]
-		[Route("register")]
+		[HttpPost, Route("register")]
 		public async Task<IActionResult> Register([FromBody] LoginRegisterModel data)
 		{
 			var user = await _userManager.FindByEmailAsync(data.Email);
@@ -104,20 +109,39 @@ namespace MyBlazor.Server.Controllers
 			}
 		}
 
-		[HttpGet]
-		[Route("auth_test")]
+		[HttpGet, Route("auth_test")]
 		[OutputCache(NoStore = true)]
 		public async Task<IActionResult> AuthTest()
 		{
+			if (HttpContext.User is not null && HttpContext.User.Identity.IsAuthenticated)
+			{
+
+			}
 			return Ok();
 		}
 
-		[HttpGet]
-		[Route("userinfo")]
-		[OutputCache(NoStore = true)]
-		public async Task<IActionResult> UserInfo()
+		[HttpPost, Route("validate_token")]
+		[Authorize, OutputCache(NoStore = true)]
+		public async Task<IActionResult> ValidateToken()
 		{
-			if (HttpContext.User is not null) // JWT token was validated
+			// Authorization happens implicitly with [Authorize], so this code only runs if user is authenticated
+			var email = HttpContext.User.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault();
+			if (email is not null)
+			{
+				var user = await _userManager.FindByEmailAsync(email.Value);
+				if (user is not null && user.Email is not null)
+				{
+					return Ok();
+				}
+			}
+			return BadRequest();
+		}
+
+		[HttpPost, Route("refresh_token")]
+		[Authorize, OutputCache(NoStore = true)]
+		public async Task<IActionResult> RefreshToken()
+		{
+			if (HttpContext.User is not null)
 			{
 				var email = HttpContext.User.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault();
 				if (email is not null)
@@ -125,17 +149,13 @@ namespace MyBlazor.Server.Controllers
 					var user = await _userManager.FindByEmailAsync(email.Value);
 					if (user is not null && user.Email is not null)
 					{
-						_logger.Log(LogLevel.Information, "Userinfo: Retreiving user data!");
-						var userInfo = new UserModel
+						return Ok(new
 						{
-							Id = user.Id,
-							Email = user.Email
-						};
-						return Ok(userInfo);
+							Token = GenerateJwtToken(user)
+						});
 					}
 				}
 			}
-
 			return BadRequest();
 		}
 	}

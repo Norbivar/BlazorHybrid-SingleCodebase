@@ -1,6 +1,18 @@
-.grid-container {
-    display: inline-grid;
-    column-gap: 20px;
-    row-gap: 5px;
-    grid-template-columns: auto auto;
+#base {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    width: max-content;
+    padding: 20px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#login-button {
+    margin-top: 10px;
+    width: 6rem;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
 }

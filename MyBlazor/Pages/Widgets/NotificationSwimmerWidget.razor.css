@@ -74,3 +74,10 @@
     right: 1%;
     top: 5%;
 }
+
+@media (max-width: 640px) {
+    .base {
+        max-width: 98%;
+        margin-left: 1%;
+    }
+}

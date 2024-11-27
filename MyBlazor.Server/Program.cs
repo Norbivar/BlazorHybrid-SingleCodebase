@@ -46,8 +46,8 @@ builder.Services.AddControllers()
 
 builder.Logging.AddSimpleConsole(options =>
 {
-	options.IncludeScopes = false;
 	options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
+	options.IncludeScopes = true;
 	options.SingleLine = true;
 	options.TimestampFormat = "HH:mm:ss ";
 });

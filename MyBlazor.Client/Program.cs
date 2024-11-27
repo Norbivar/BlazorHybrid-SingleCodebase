@@ -20,8 +20,9 @@ builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddSingleton<INotificationService, NotificationService>()
 	.AddScoped<IFetchDataService, FetchDataService>()
-	.AddScoped<AuthenticationStateProvider, JWTAuthenticationStateProvider>()
-	.AddScoped<IAuthenticationStateProvider, JWTAuthenticationStateProvider>()
 	.AddScoped<HttpHubService>();
+
+builder.Services.AddScoped<IAuthenticationService, ClientAuthenticationService>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 await builder.Build().RunAsync();

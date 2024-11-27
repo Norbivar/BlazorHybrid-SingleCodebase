@@ -10,26 +10,43 @@
 @using Blazored.LocalStorage
 @using System.Net.Http.Headers
 
-@inject NavigationManager navigationManager;
+@inject NavigationManager NavigationManager;
 @inject INotificationService NotificationService
-@inject IAuthenticationStateProvider AuthStateProvider
+@inject IAuthenticationService AuthenticationService
 @inject HttpHubService HttpHub
 
-<h3>Login</h3>
-
-<form method="post" @onsubmit="HandleSubmit">
-	<AntiforgeryToken />
-
-	<fieldset class="grid-container">
-		<label for="email">E-mail:</label>
-		<input type="text" name="email" @bind=email />
-
-		<label for="pass">Password:</label>
-		<input type="password" name="pass" @bind=password />
-
-		<input type="submit" value="Login">
-	</fieldset>
-</form>
+<div>
+	<div id="base">
+		<table>
+			<tr>
+				<td>
+					<h3>Login</h3>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="email">E-mail:</label>
+				</td>
+				<td>
+					<input type="text" name="email" @bind=email />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="pass">Password:</label>
+				</td>
+				<td>
+					<input type="password" name="pass" @bind=password />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input id="login-button" type="submit" value="Login" @onclick="HandleSubmit" />
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
 
 @code {
 	private string email = "";
@@ -54,11 +71,16 @@
 
 		if (loginResult.Success && loginResult.Value is not null && loginResult.Value.JWTToken is not null)
 		{
-			var result = await AuthStateProvider.TryLoginWithTokenAsync(loginResult.Value.JWTToken);
-
-			result.Match(
-				() => NotificationService.SendNotificationSwimmer("Success", "Login successful!"),
-				err => NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error));
+			var result = await AuthenticationService.LoginAsync(loginResult.Value.JWTToken);
+			if (result)
+			{
+				NotificationService.SendNotificationSwimmer("Success", "Login successful!");
+				NavigationManager.NavigateTo("/");
+			}
+			else
+			{
+			NotificationService.SendNotificationSwimmer("Error", "Invalid username/password!", NotificationType.Error);
+			}
 		}
 		else
 		{

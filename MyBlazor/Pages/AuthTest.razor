@@ -10,7 +10,7 @@
 @using System.Security.Claims
 
 @inject HttpClient HttpClient
-@inject IAuthenticationStateProvider AuthenticationStateProvider
+@inject INotificationService NotificationService
 
 <PageTitle>Auth Test</PageTitle>
 
@@ -26,9 +26,24 @@
 	</NotAuthorized>
 </AuthorizeView>
 
+<p><button @onclick="SendSwimmerNotif">Send Swimmer Notif</button></p>
+
 @code {
-	[CascadingParameter]
-	private Task<AuthenticationState>? authenticationState { get; set; }
+		[CascadingParameter]
+		private Task<AuthenticationState>? authenticationState { get; set; }
+
+		private void SendSwimmerNotif()
+		{
+			string desc = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut" +
+			"labore et dolore magna aliqua. Ut enim ad minim veniam, quis " +
+			"nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat";
+
+		NotificationService.SendNotificationSwimmer(new NotificationSwimmer
+		{
+			Title = "Test Notif",
+			Description = desc,
+		});
+	}
 
 	private async void SecureMethod()
 	{
@@ -45,18 +60,5 @@
 			}
 		}
 		Console.WriteLine($"SecureMethod done!");
-
-		// var content = new StringContent("", Encoding.UTF8, "application/json");
-		// var response = await HttpClient.PostAsync($"account/auth_test", content)
-		// 	.ConfigureAwait(false);
-
-		// if (response.IsSuccessStatusCode)
-		// {
-		// 	Console.WriteLine("VN: AUTH !!");
-		// }
-		// else
-		// {
-		// 	Console.WriteLine("VN: FAILED AUTH !!");
-		// }
 	}
 }

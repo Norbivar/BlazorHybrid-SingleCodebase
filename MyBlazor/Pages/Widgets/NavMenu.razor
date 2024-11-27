@@ -1,7 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using MyBlazor.Authentication
+@using MyBlazor.Notifications
 
-@inject IAuthenticationStateProvider AuthenticationStateProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject INotificationService NotificationService
+@inject IAuthenticationService AuthenticationService
 
 <div class="top-row ps-3 navbar navbar-dark">
 	<div class="container-fluid">
@@ -16,7 +19,6 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
 	<nav class="flex-column">
-
 		@if (!isLoggedIn)
 		{
 			<!-- Login / Logout stuff -->
@@ -58,7 +60,12 @@
 	{
 		<nav class="flex-column">
 			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+				<NavLink class="nav-link" href="settings">
+					<span class="oi oi-cog" aria-hidden="true"></span> Settings
+				</NavLink>
+			</div>
+			<div class="nav-item px-3">
+				<NavLink class="nav-link" @onclick="TryLogout">
 					<span class="oi oi-account-logout" aria-hidden="true"></span> Logout
 				</NavLink>
 			</div>
@@ -86,6 +93,26 @@
 		isLoggedIn = (authResult.User.Identity is not null && authResult.User.Identity.IsAuthenticated);
 
 		await InvokeAsync(StateHasChanged); // trigger UI refresh for the NavMenu
+	}
+
+	private void TryLogout()
+	{
+		NotificationPopup confirmation = new NotificationPopup
+			{
+				Title = "Confirm",
+				Description = "Please confirm whether you really wish to log out?",
+				Buttons = new List<NotificationPopup.PopupButtonID> {
+					NotificationPopup.PopupButtonID.Ok,
+					NotificationPopup.PopupButtonID.Cancel
+				}
+			};
+
+		confirmation.OnClickedOK += () =>
+		{
+			AuthenticationService.LogoutAsync();
+		};
+
+		NotificationService.SendNotificationPopup(confirmation);
 	}
 
 	protected override void OnInitialized()

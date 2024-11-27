@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using MyBlazor.Notifications
+
+@inject INotificationService NotificationService
+@inject NavigationManager NavigationManager;
+
+<AuthorizeView>
+	<Authorized>
+		@ChildContent
+	</Authorized>
+	<NotAuthorized>
+		@if (NotAuthorizedHandler.HasDelegate)
+		{
+			NotAuthorizedHandler.InvokeAsync();
+		}
+		else
+		{
+			NotAuthorizedDefaultHandler();
+		}
+	</NotAuthorized>
+</AuthorizeView>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public EventCallback NotAuthorizedHandler { get; set; }
+
+	private void NotAuthorizedDefaultHandler()
+	{
+		NotificationService.SendNotificationSwimmer("Failed", "You are not authorized!", NotificationType.Error);
+		NavigationManager.NavigateTo("/");
+	}
+}

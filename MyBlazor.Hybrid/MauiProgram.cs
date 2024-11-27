@@ -35,11 +35,12 @@ namespace MyBlazor.Hybrid
             builder.Services.AddCascadingAuthenticationState();
 			builder.Services.AddAuthorizationCore();
 
-            builder.Services.AddScoped<IFetchDataService, FetchDataService>()
-                .AddSingleton<INotificationService, NotificationService>()
-                .AddScoped<AuthenticationStateProvider, JWTAuthenticationStateProvider>()
-                .AddScoped<IAuthenticationStateProvider, JWTAuthenticationStateProvider>()
-                .AddScoped<HttpHubService>();
+			builder.Services.AddSingleton<INotificationService, NotificationService>()
+				.AddScoped<IFetchDataService, FetchDataService>()
+				.AddScoped<HttpHubService>();
+
+			builder.Services.AddScoped<IAuthenticationService, ClientAuthenticationService>();
+			builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 			return builder.Build();
         }

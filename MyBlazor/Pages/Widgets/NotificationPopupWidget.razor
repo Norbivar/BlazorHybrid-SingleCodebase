@@ -1,7 +1,7 @@
 ﻿@using MyBlazor.Notifications
 
 <div class="canvas">
-	<div class="base base-size-specific">
+	<div class="base base-size-specific @popupAdditionalClass">
 		<table class="internal">
 			<tr>
 				<td class="title">
@@ -41,4 +41,10 @@
 @code {
 	[Parameter]
 	public required MyBlazor.Notifications.NotificationPopup notificationPopupModel { get; set; }
+
+	private static string popupAdditionalClass = "";
+	protected override async Task OnInitializedAsync()
+	{
+		popupAdditionalClass = "sliding-in";
+	}
 }

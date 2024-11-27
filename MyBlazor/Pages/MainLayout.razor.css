@@ -59,7 +59,7 @@ main {
         width: 300px;
         height: 100vh;
         top: 0px;
-        left: -288px;
+        left: -280px;
         overflow: hidden;
         position: absolute;
         border-right-style: solid;
@@ -92,14 +92,14 @@ main {
 
     #swim-lane {
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         align-items: end;
         width: 40%;
-        height: 40%;
+        height: 60%;
         top: auto;
         left: auto;
         right: 10px;
-        bottom: 10px;
+        bottom: 5%;
         overflow: hidden;
         position: fixed;
         z-index: 101;
