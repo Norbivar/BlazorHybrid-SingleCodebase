@@ -32,7 +32,7 @@
     border-color: darkslateblue;
     border-style: solid;
     border-width: 3px;
-    max-width: 50%;
+    max-width: 100%;
 }
 
 .sliding-in {
@@ -73,6 +73,9 @@
     width: 20px;
     right: 1%;
     top: 5%;
+}
+.exit:hover {
+    color: aqua;
 }
 
 @media (max-width: 640px) {

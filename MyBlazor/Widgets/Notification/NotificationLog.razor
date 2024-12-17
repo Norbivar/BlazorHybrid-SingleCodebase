@@ -1,0 +1,56 @@
+﻿@using MyBlazor.Notifications
+
+@inject INotificationService NotificationService
+
+<div id="base">
+	<div id="helper-chevron-div">
+		<span id="helper-chevron" class="oi oi-chevron-left"></span>
+	</div>
+	<div id="message-box">
+		<div id="log-header">
+			Message Log
+		</div>
+		<div id="log-list">
+			@foreach (var notif in storedNotifications)
+			{
+				<div class="message-entry">
+					<div class="message-date">
+						@notif.receiveTime.ToString()
+					</div>
+					@notif.text
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	class NotificationLogEntry
+	{
+		public TimeOnly receiveTime = TimeOnly.FromDateTime(DateTime.Now);
+		public required string text;
+	}
+
+	private List<NotificationLogEntry> storedNotifications = new List<NotificationLogEntry>();
+
+	private void AddNotificationToLog(NotificationBase notification)
+	{
+		storedNotifications.Add(new NotificationLogEntry
+			{
+				text = $"{notification.Title} : {notification.Description}"
+			});
+		StateHasChanged();
+	}
+
+	protected override void OnInitialized()
+	{
+		NotificationService.OnNotificationPopupReceived += AddNotificationToLog;
+		NotificationService.OnNotificationSwimmerReceived += AddNotificationToLog;
+	}
+
+	public void Dispose()
+	{
+		NotificationService.OnNotificationPopupReceived -= AddNotificationToLog;
+		NotificationService.OnNotificationSwimmerReceived -= AddNotificationToLog;
+	}
+}

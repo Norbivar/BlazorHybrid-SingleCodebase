@@ -1,0 +1,49 @@
+﻿#base {
+    display: grid;
+    background-color: lightgrey;
+    border-radius: 20px;
+    position: fixed;
+    right: 0vh;
+    bottom: 30%;
+    width: 50vh;
+    height: 30vh;
+    z-index: 100;
+    grid-template-columns: 3vh auto;
+    grid-template-rows: 100% 100%;
+    padding: 4px 40px 4px 3px;
+}
+
+#helper-chevron-div {
+    cursor: pointer;
+    width: 90%;
+    height: 70%;
+    transform: translateY(25%);
+    background-color: gray;
+}
+
+#helper-chevron {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-25%) translateY(-50%);
+    cursor: pointer;
+    width: 100%;
+}
+
+#helper-chevron-div:hover {
+    background-color: lightslategrey;
+}
+
+#message-box {
+}
+
+.message {
+}
+
+#log-header {
+}
+
+#log-list {
+    overflow: hidden scroll;
+    width: 100%;
+    max-height: 85%;
+}

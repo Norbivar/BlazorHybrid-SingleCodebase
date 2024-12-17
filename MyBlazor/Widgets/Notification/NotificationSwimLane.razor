@@ -1,0 +1,48 @@
+﻿@using MyBlazor.Notifications
+
+@inject INotificationService NotificationService
+
+@if (notifications.Count > 0)
+{
+	<div id="swim-lane">
+		@foreach (var notif in notifications)
+		{
+			<NotificationSwimmerWidget NotificationSwimmerModel=@notif />
+		}
+	</div>
+}
+
+@code {
+	private List<NotificationSwimmer> notifications = new List<NotificationSwimmer>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
+	}
+
+	public void Dispose()
+	{
+		NotificationService.OnNotificationSwimmerReceived -= AddNotificationSwimmer;
+	}
+
+	private async void AddNotificationSwimmer(NotificationSwimmer notification)
+	{
+		notification.ShouldDisappearHandler = new Timer(async state =>
+		{
+			while (notification.HoveredOver && !notification.ManuallyClosed)
+			{
+				await Task.Delay(500);
+			}
+
+			notification.Display = false;
+			await InvokeAsync(StateHasChanged);
+			await Task.Delay(700);
+
+			notifications.Remove(notification);
+			await InvokeAsync(StateHasChanged);
+		}, notification, notification.ShowFor, Timeout.InfiniteTimeSpan);
+
+		notifications.Add(notification);
+		await InvokeAsync(StateHasChanged);
+	}
+}

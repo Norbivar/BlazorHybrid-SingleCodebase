@@ -1,0 +1,19 @@
+﻿#swim-lane {
+}
+
+@media (min-width: 641px) {
+    #swim-lane {
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: end;
+        width: 30%;
+        height: auto;
+        right: 10px;
+        bottom: 3%;
+        max-height: 60%;
+        z-index: 101;
+        overflow: hidden;
+        position: fixed;
+        background-color: none;
+    }
+}

@@ -89,20 +89,4 @@ main {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }
-
-    #swim-lane {
-        display: flex;
-        flex-direction: column-reverse;
-        align-items: end;
-        width: 40%;
-        height: 60%;
-        top: auto;
-        left: auto;
-        right: 10px;
-        bottom: 5%;
-        overflow: hidden;
-        position: fixed;
-        z-index: 101;
-        background-color: none;
-    }
 }

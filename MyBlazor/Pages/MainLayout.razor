@@ -2,6 +2,8 @@
 
 @using MyBlazor.Authentication
 @using MyBlazor.Notifications
+@using MyBlazor.Widgets.Notification
+
 @inherits LayoutComponentBase
 
 @inject INotificationService NotificationService
@@ -17,12 +19,9 @@
 		<NavMenu />
 	</div>
 
-	<div id="swim-lane">
-		@foreach (var notif in notifications)
-		{
-			<NotificationSwimmerWidget NotificationSwimmerModel=@notif />
-		}
-	</div>
+	<NotificationSwimLane />
+
+	<!-- <NotificationLog /> -->
 
 	<main>
 		<!--
@@ -38,7 +37,6 @@
 </div>
 
 @code {
-    private List<NotificationSwimmer> notifications = new List<NotificationSwimmer>();
     private NotificationPopup? activePopup;
 
 	protected override async Task OnInitializedAsync()
@@ -46,13 +44,11 @@
 		await AuthenticationService.ReloginAsync();
 
 		NotificationService.OnNotificationPopupReceived += AddNotificationPopup;
-		NotificationService.OnNotificationSwimmerReceived += AddNotificationSwimmer;
 	}
 
 	public void Dispose()
 	{
 		NotificationService.OnNotificationPopupReceived -= AddNotificationPopup;
-		NotificationService.OnNotificationSwimmerReceived -= AddNotificationSwimmer;
 	}
 
 	private async void ClearPopup()
@@ -67,27 +63,6 @@
 		popup.OnClickedCancel += ClearPopup;
 
 		activePopup = popup;
-		await InvokeAsync(StateHasChanged);
-	}
-
-	private async void AddNotificationSwimmer(NotificationSwimmer notification)
-	{
-		notification.ShouldDisappearHandler = new Timer(async state =>
-		{
-			while (notification.HoveredOver && !notification.ManuallyClosed)
-			{
-				await Task.Delay(500);
-			}
-
-			notification.Display = false;
-			await InvokeAsync(StateHasChanged);
-			await Task.Delay(700);
-
-			notifications.Remove(notification);
-			await InvokeAsync(StateHasChanged);
-		}, notification, notification.ShowFor, Timeout.InfiniteTimeSpan);
-
-		notifications.Add(notification);
 		await InvokeAsync(StateHasChanged);
 	}
 }
